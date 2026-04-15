@@ -1,12 +1,18 @@
 # AI分身创建页面 - 技术架构文档
 
 ## 技术栈
-- **框架**: React 18 + TypeScript
-- **构建工具**: Vite
-- **样式**: Tailwind CSS
-- **状态管理**: Zustand
-- **路由**: React Router DOM
-- **图标**: Lucide React
+
+* **框架**: React 18 + TypeScript
+
+* **构建工具**: Vite
+
+* **样式**: Tailwind CSS
+
+* **状态管理**: Zustand
+
+* **路由**: React Router DOM
+
+* **图标**: Lucide React
 
 ## 项目结构
 
@@ -43,6 +49,7 @@ src/
 ## 核心组件设计
 
 ### 1. Slider 滑块组件
+
 ```typescript
 interface SliderProps {
   label: string;
@@ -54,6 +61,7 @@ interface SliderProps {
 ```
 
 ### 2. TagSelector 标签选择器
+
 ```typescript
 interface TagSelectorProps {
   categories: TagCategory[];
@@ -68,6 +76,7 @@ interface TagCategory {
 ```
 
 ### 3. QAInterface 问答界面
+
 ```typescript
 interface QAInterfaceProps {
   messages: Message[];
@@ -87,6 +96,7 @@ interface Message {
 ## 状态管理设计
 
 ### Zustand Store 结构
+
 ```typescript
 interface AvatarStore {
   // 表单状态
@@ -121,6 +131,7 @@ interface AvatarStore {
 ## API 接口设计
 
 ### 抖音导入
+
 ```typescript
 POST /api/douyin/import
 Response: {
@@ -131,6 +142,7 @@ Response: {
 ```
 
 ### AI 问答
+
 ```typescript
 POST /api/ai/question
 Request: {
@@ -145,6 +157,7 @@ Response: {
 ```
 
 ### 保存配置
+
 ```typescript
 POST /api/avatar/create
 Request: AvatarConfig
@@ -160,3 +173,4 @@ Response: {
 2. **状态切片**: Zustand 使用选择器避免不必要的重渲染
 3. **防抖处理**: 滑块变化使用防抖避免频繁更新
 4. **本地存储**: 自动保存草稿到 localStorage
+

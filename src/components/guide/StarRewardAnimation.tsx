@@ -3,9 +3,10 @@ import { Sparkles, Star } from 'lucide-react';
 
 interface StarRewardAnimationProps {
   onComplete: () => void;
+  amount?: number;
 }
 
-export function StarRewardAnimation({ onComplete }: StarRewardAnimationProps) {
+export function StarRewardAnimation({ onComplete, amount = 100 }: StarRewardAnimationProps) {
   const [show, setShow] = useState(true);
 
   useEffect(() => {
@@ -65,12 +66,12 @@ export function StarRewardAnimation({ onComplete }: StarRewardAnimationProps) {
           </div>
         </div>
 
-        {/* 奖励文字 - 直接显示100 */}
+        {/* 奖励文字 */}
         <div className="text-center">
           <p className="text-white/70 text-sm mb-3 tracking-wider">恭喜获得</p>
           <div className="flex items-center justify-center gap-3">
             <Sparkles size={28} className="text-amber-300 animate-pulse" />
-            <span className="text-5xl font-bold text-white drop-shadow-lg">100</span>
+            <span className="text-5xl font-bold text-white drop-shadow-lg">{amount}</span>
             <span className="text-xl text-amber-200 font-medium">星光</span>
           </div>
         </div>

@@ -13,7 +13,7 @@ export function SyncProgressBar() {
         <div className="flex items-center gap-1.5 flex-shrink-0">
           <Sparkles size={14} className="text-white/80" />
           <span className="text-xs text-white/80 font-medium">
-            分身同频值
+            活跃度
           </span>
         </div>
 
@@ -25,10 +25,10 @@ export function SyncProgressBar() {
           />
         </div>
 
-        {/* 右侧：百分比和关闭按钮 */}
+        {/* 右侧：等级和关闭按钮 */}
         <div className="flex items-center gap-1.5 flex-shrink-0">
           <span className="text-xs text-white/90 font-bold">
-            {totalProgress}%
+            Lv1
           </span>
           {!rewardUnlocked && (
             <button

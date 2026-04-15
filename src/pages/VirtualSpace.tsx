@@ -4,7 +4,13 @@ import {
   BookHeart, 
   X,
   ChevronLeft,
-  Sparkles
+  Sparkles,
+  ClipboardList,
+  CheckCircle2,
+  Circle,
+  Star,
+  Zap,
+  Gift
 } from 'lucide-react';
 import { useGuideStore } from '@/stores/guideStore';
 import { SyncProgressBar } from '@/components/guide/SyncProgressBar';
@@ -21,11 +27,60 @@ interface Message {
   avatar?: string;
 }
 
+interface DailyTask {
+  id: string;
+  name: string;
+  description: string;
+  reward: number;
+  activity: number;
+  completed: boolean;
+}
+
 const SUGGESTIONS = [
   '讲个冷知识✨',
   '猜个字谜✨',
   '抖个机灵✨',
 ];
+
+const DAILY_TASKS: DailyTask[] = [
+  {
+    id: '1',
+    name: '早安分身',
+    description: '每日首次进入互动空间，与分身互发1条消息',
+    reward: 10,
+    activity: 1,
+    completed: false,
+  },
+  {
+    id: '2',
+    name: '串门吃瓜',
+    description: '去1个好友或广场上的AI分身空间互动',
+    reward: 10,
+    activity: 1,
+    completed: false,
+  },
+  {
+    id: '3',
+    name: '深度共鸣',
+    description: '当日累计与分身进行3轮对话（一问一答算1轮）',
+    reward: 20,
+    activity: 3,
+    completed: false,
+  },
+  {
+    id: '4',
+    name: '分身打工',
+    description: '给分身发布任务，让分身完成任务并汇报',
+    reward: 30,
+    activity: 5,
+    completed: false,
+  },
+];
+
+const TREASURE_BOX = {
+  reward: 20,
+  activity: 5,
+};
 
 const MOCK_MESSAGES: Message[] = [
   {
@@ -73,6 +128,12 @@ export default function VirtualSpace() {
   const [onlineCount, setOnlineCount] = useState(1);
   const [showRewardAnimation, setShowRewardAnimation] = useState(false);
   const [hideProgressBar, setHideProgressBar] = useState(false);
+  const [showDailyTasks, setShowDailyTasks] = useState(false);
+  const [dailyTasks, setDailyTasks] = useState<DailyTask[]>(DAILY_TASKS);
+  const [treasureBoxClaimed, setTreasureBoxClaimed] = useState(false);
+  const [taskRewardAnimation, setTaskRewardAnimation] = useState<{ show: boolean; amount: number }>({ show: false, amount: 0 });
+  
+  const allTasksCompleted = dailyTasks.every(t => t.completed);
   
   const { 
     startGuide, 
@@ -141,6 +202,37 @@ export default function VirtualSpace() {
     completeTask('companion_diary' as GuideStep);
   };
 
+  const handleDailyTasksClick = () => {
+    setShowDailyTasks(true);
+  };
+
+  const handleTaskClick = (taskId: string) => {
+    const task = dailyTasks.find(t => t.id === taskId);
+    if (task && !task.completed) {
+      // 完成任务，显示星光特效
+      setTaskRewardAnimation({ show: true, amount: task.reward });
+      setDailyTasks(prev => prev.map(t => 
+        t.id === taskId ? { ...t, completed: true } : t
+      ));
+    } else if (task && task.completed) {
+      // 取消完成状态
+      setDailyTasks(prev => prev.map(t => 
+        t.id === taskId ? { ...t, completed: false } : t
+      ));
+    }
+  };
+
+  const handleTaskRewardAnimationComplete = () => {
+    setTaskRewardAnimation({ show: false, amount: 0 });
+  };
+
+  const handleTreasureBoxClick = () => {
+    if (allTasksCompleted && !treasureBoxClaimed) {
+      setTaskRewardAnimation({ show: true, amount: TREASURE_BOX.reward });
+      setTreasureBoxClaimed(true);
+    }
+  };
+
   const handleMultiplayerClick = () => {
     setIsMultiplayer(true);
     setOnlineCount(3);
@@ -181,6 +273,14 @@ export default function VirtualSpace() {
       {/* 星光奖励动画 */}
       {showRewardAnimation && (
         <StarRewardAnimation onComplete={handleRewardAnimationComplete} />
+      )}
+
+      {/* 任务奖励动画 */}
+      {taskRewardAnimation.show && (
+        <StarRewardAnimation 
+          onComplete={handleTaskRewardAnimationComplete} 
+          amount={taskRewardAnimation.amount}
+        />
       )}
 
       <div className="relative z-10 flex flex-col h-screen">
@@ -256,6 +356,17 @@ export default function VirtualSpace() {
           <GuideTooltip targetId="companion-diary">
             <div />
           </GuideTooltip>
+
+          {/* 每日任务 - 新增 */}
+          <button
+            onClick={handleDailyTasksClick}
+            className="flex flex-col items-center gap-1"
+          >
+            <div className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center border border-white/20">
+              <ClipboardList size={18} className="text-white" />
+            </div>
+            <span className="text-[10px] text-white/80">每日任务</span>
+          </button>
         </div>
 
         {/* 底部区域 */}
@@ -335,7 +446,7 @@ export default function VirtualSpace() {
           <div className="bg-white rounded-2xl w-full max-w-sm max-h-[80vh] overflow-hidden">
             <div className="flex items-center justify-between p-4 border-b">
               <h2 className="font-semibold text-gray-800">陪伴日记</h2>
-              <button 
+              <button
                 onClick={() => setShowDiary(false)}
                 className="p-1 hover:bg-gray-100 rounded-full"
               >
@@ -347,6 +458,130 @@ export default function VirtualSpace() {
                 <BookHeart size={48} className="mx-auto mb-2 opacity-30" />
                 <p>记录着我们的相伴时光</p>
                 <p className="text-sm mt-1">开始互动后，这里会记录美好回忆</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 每日任务弹窗 */}
+      {showDailyTasks && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl w-full max-w-sm overflow-hidden">
+            <div className="flex items-center justify-between p-3 border-b border-gray-100">
+              <div className="flex items-center gap-2">
+                <ClipboardList size={18} className="text-purple-600" />
+                <h2 className="font-semibold text-gray-800 text-base">每日任务</h2>
+              </div>
+              <button
+                onClick={() => setShowDailyTasks(false)}
+                className="p-1 hover:bg-gray-100 rounded-full transition-colors"
+              >
+                <X size={18} className="text-gray-500" />
+              </button>
+            </div>
+            <div className="p-3 space-y-2">
+              {dailyTasks.map((task) => (
+                <div
+                  key={task.id}
+                  onClick={() => handleTaskClick(task.id)}
+                  className={`p-3 rounded-xl border-2 transition-all cursor-pointer ${
+                    task.completed
+                      ? 'bg-purple-50 border-purple-200'
+                      : 'bg-white border-gray-100 hover:border-purple-200 hover:bg-purple-50/30'
+                  }`}
+                >
+                  <div className="flex items-start gap-2">
+                    <div className="flex-shrink-0 mt-0.5">
+                      {task.completed ? (
+                        <CheckCircle2 size={18} className="text-purple-500" />
+                      ) : (
+                        <Circle size={18} className="text-gray-300" />
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className={`font-semibold text-sm mb-0.5 ${
+                        task.completed ? 'text-gray-500 line-through' : 'text-gray-800'
+                      }`}>
+                        {task.name}
+                      </h3>
+                      <p className={`text-xs leading-snug ${
+                        task.completed ? 'text-gray-400' : 'text-gray-500'
+                      }`}>
+                        {task.description}
+                      </p>
+                      <div className="flex items-center gap-3 mt-1.5">
+                        <div className="flex items-center gap-1">
+                          <Star size={12} className="text-amber-400" />
+                          <span className="text-xs text-amber-600 font-medium">+{task.reward}星光</span>
+                        </div>
+                        {task.activity > 0 && (
+                          <div className="flex items-center gap-1">
+                            <Zap size={12} className="text-pink-400" />
+                            <span className="text-xs text-pink-500 font-medium">+{task.activity}活跃度</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+              {/* 活跃宝箱 */}
+              <div 
+                onClick={handleTreasureBoxClick}
+                className={`p-3 rounded-xl border-2 transition-all cursor-pointer ${
+                  treasureBoxClaimed
+                    ? 'bg-gray-100 border-gray-200 opacity-60'
+                    : allTasksCompleted
+                    ? 'bg-gradient-to-r from-amber-50 to-orange-50 border-amber-300 hover:border-amber-400 hover:shadow-lg hover:shadow-amber-200/50'
+                    : 'bg-gradient-to-r from-amber-50/50 to-orange-50/50 border-amber-200'
+                }`}
+              >
+                <div className="flex items-start gap-2">
+                  <div className="flex-shrink-0">
+                    <Gift size={18} className={treasureBoxClaimed ? 'text-gray-400' : 'text-amber-500'} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className={`font-semibold text-sm mb-0.5 ${
+                      treasureBoxClaimed ? 'text-gray-400 line-through' : 'text-gray-800'
+                    }`}>
+                      活跃宝箱
+                    </h3>
+                    <p className="text-xs text-gray-500 leading-snug">
+                      {treasureBoxClaimed 
+                        ? '奖励已领取' 
+                        : allTasksCompleted 
+                        ? '点击领取额外奖励' 
+                        : '完成所有每日任务后领取'}
+                    </p>
+                    <div className="flex items-center gap-3 mt-1.5">
+                      <div className="flex items-center gap-1">
+                        <Star size={12} className="text-amber-400" />
+                        <span className="text-xs text-amber-600 font-medium">+{TREASURE_BOX.reward}星光</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Zap size={12} className="text-pink-400" />
+                        <span className="text-xs text-pink-500 font-medium">+{TREASURE_BOX.activity}活跃度</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="p-3 border-t border-gray-100 bg-gray-50">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-gray-500">今日进度</span>
+                <span className="font-semibold text-purple-600">
+                  {dailyTasks.filter(t => t.completed).length}/{dailyTasks.length}
+                </span>
+              </div>
+              <div className="mt-1.5 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-gradient-to-r from-purple-400 to-pink-400 rounded-full transition-all duration-500"
+                  style={{
+                    width: `${(dailyTasks.filter(t => t.completed).length / dailyTasks.length) * 100}%`
+                  }}
+                />
               </div>
             </div>
           </div>
