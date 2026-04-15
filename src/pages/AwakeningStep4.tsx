@@ -120,7 +120,7 @@ export default function AwakeningStep4() {
         >
           {/* 实体仔仔图片 */}
           <motion.img
-            src="https://copilot-cn.bytedance.net/api/ide/v1/text_to_image?prompt=cute%20Q-version%20anime%20character%20with%20cap%20and%20headphones%2C%20wearing%20red%20jacket%20and%20white%20tank%20top%2C%20clear%20eyes%2C%203D%20render%2C%20clean%20background%2C%20high%20quality&image_size=square_hd"
+            src="/renxiang.png"
             alt="实体仔仔"
             className="w-full h-full object-contain"
             animate={{
