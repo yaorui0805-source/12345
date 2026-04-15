@@ -11,9 +11,9 @@ export default function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<CreateAvatar />} />
+        <Route path="/" element={<Awakening />} />
         <Route path="/space" element={<VirtualSpace />} />
-        <Route path="/awakening" element={<Awakening />} />
+        <Route path="/create-avatar" element={<CreateAvatar />} />
         <Route path="/awakening-step2" element={<AwakeningStep2 />} />
         <Route path="/awakening-step3" element={<AwakeningStep3 />} />
         <Route path="/awakening-step4" element={<AwakeningStep4 />} />
