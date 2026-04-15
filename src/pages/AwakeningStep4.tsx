@@ -102,7 +102,7 @@ export default function AwakeningStep4() {
 
       {/* 实体仔仔 */}
       <motion.div
-        className="relative z-10"
+        className="relative z-10 -mt-16"
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 1.5, ease: 'easeOut' }}
